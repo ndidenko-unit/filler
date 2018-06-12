@@ -98,6 +98,7 @@ void ft_printcoord(t_data *data)
 			h++;
 		}
 	}
+	// system ("leaks a.out");
 	ft_putnbr(data->resh);
 	write(1, " ", 1);
 	ft_putnbr(data->resw);
