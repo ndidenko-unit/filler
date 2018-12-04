@@ -12,7 +12,7 @@
 
 NAME = ndidenko.filler
 
-FILE_C =  main.c manhattan.c printcoord.c
+FILE_C =  main.c manhattan.c printcoord.c free_maps.c
 
 FILE_O = $(FILE_C:.c=.o)
 

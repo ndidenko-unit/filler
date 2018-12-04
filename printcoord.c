@@ -13,24 +13,45 @@
 #include "libft/libft.h"
 #include "filler.h"
 
-static int ft_place(t_data *data, int map_h, int map_w)
+void			ft_up(t_data *data)
 {
 	int h;
 	int w;
-	int count;
 
-	count = 0;
+	h = 0;
+	w = 0;
+	while (h < data->m_height)
+	{
+		if (data->map[h][w] != data->letter1 &&
+			data->map[h][w] != data->letter2 && data->map[h][w] != '~')
+			data->map[h][w] = data->step < 7 ? h : h + w;
+		if (w < data->m_width)
+			w++;
+		else
+		{
+			w = 0;
+			h++;
+		}
+	}
+}
+
+static int		ft_place(t_data *data, int map_h, int map_w, int count)
+{
+	int h;
+	int w;
+
 	h = 0;
 	w = 0;
 	while (h < data->t_height)
 	{
-		if (data->token[h][w] == '*' && map_h + h < data->m_height && map_w + w < data->m_width)
+		if (data->token[h][w] == '*' && map_h + h < data->m_height &&
+												map_w + w < data->m_width)
 		{
-			if(data->map[map_h + h][map_w + w] == data->letter1)
+			if (data->map[map_h + h][map_w + w] == data->letter1)
 				count++;
-			if (data->map[map_h + h][map_w + w] == data->letter2 || 
+			if (data->map[map_h + h][map_w + w] == data->letter2 ||
 				data->map[map_h + h][map_w + w] == '~' || count == 2)
-				return(0);
+				return (0);
 		}
 		if (w < data->t_width)
 			w++;
@@ -39,26 +60,25 @@ static int ft_place(t_data *data, int map_h, int map_w)
 			w = 0;
 			h++;
 		}
-	} 
-	return(count);
+	}
+	return (count);
 }
 
-static void ft_bestplace(t_data *data, int map_h, int map_w)
+static void		ft_bestplace(t_data *data, int map_h, int map_w)
 {
 	int h;
 	int w;
 
 	h = 0;
 	w = 0;
-
 	while (h < data->t_height)
 	{
-		if (data->token[h][w] == '*' && data->map[h + map_h][w + map_w] <= data->manhattan)
+		if (data->token[h][w] == '*' &&
+				data->map[h + map_h][w + map_w] <= data->manhattan)
 		{
 			data->manhattan = data->map[h + map_h][w + map_w];
 			data->resh = map_h;
 			data->resw = map_w;
-			// printf("\nreshw %d %d||manhattan = %d||\n", data->resh, data->resw, data->manhattan);
 		}
 		if (w < data->t_width)
 			w++;
@@ -70,25 +90,31 @@ static void ft_bestplace(t_data *data, int map_h, int map_w)
 	}
 }
 
-void ft_printcoord(t_data *data)
+static void		ft_output(t_data *data)
+{
+	ft_putnbr(data->resh);
+	write(1, " ", 1);
+	ft_putnbr(data->resw);
+	write(1, "\n", 1);
+}
+
+void			ft_printcoord(t_data *data)
 {
 	int h;
 	int w;
+	int count;
 
 	h = 0;
 	w = 0;
+	count = 0;
 	data->manhattan = 1234567890;
 	while (h < data->m_height)
 	{
-		// if (data->map[h][w] != data->letter1 && data->map[h][w] != data->letter2)
-		if (h + data->t_height < data->m_height && w + data->t_width < data->m_width)
+		if (h + data->t_height < data->m_height &&
+					w + data->t_width < data->m_width)
 		{
-			if (ft_place(data, h, w) == 1)
-			{
-				// printf("valid coord is %d %d\n", h, w);
+			if (ft_place(data, h, w, count) == 1)
 				ft_bestplace(data, h, w);
-			}
-
 		}
 		if (w < data->m_width)
 			w++;
@@ -98,10 +124,5 @@ void ft_printcoord(t_data *data)
 			h++;
 		}
 	}
-	// system ("leaks a.out");
-	ft_putnbr(data->resh);
-	write(1, " ", 1);
-	ft_putnbr(data->resw);
-	write(1, "\n", 1);
-	// printf("%s\n", data->line);
+	ft_output(data);
 }

@@ -27,16 +27,14 @@ static t_data	ft_init(void)
 	data.t_width = 0;
 	data.t_height = 0;
 	data.token = 0;
-	data.minh = 0;
-	data.minw = 0;
 	data.resh = 0;
 	data.resw = 0;
 	data.manhattan = 1234567890;
-	data.min = 1234567890;
-	return(data);
+	data.step = 0;
+	return (data);
 }
 
-static void ft_player(t_data *data)
+static void		ft_player(t_data *data)
 {
 	if (data->line[10] == '1')
 	{
@@ -50,49 +48,15 @@ static void ft_player(t_data *data)
 	}
 }
 
-void		ft_free_map(t_data *data)
+static void		ft_parsmap(t_data *data)
 {
 	int		h;
-	char	*str;
-
-	if (!data->map)
-		return ;
-	h = 0;
-	while (h < data->m_height)
-	{
-		str = data->map[h];
-		ft_strdel(&str);
-		h++;
-	}
-	ft_memdel((void **)&data->map);
-}
-
-void		ft_free_token(t_data *data)
-{
-	int		h;
-	char	*str;
-
-	if (!data->token)
-		return ;
-	h = 0;
-	while (h < data->t_height)
-	{
-		str = data->token[h];
-		ft_strdel(&str);
-		h++;
-	}
-	ft_memdel((void **)&data->token);
-}
-
-static void ft_parsmap(t_data *data)
-{
-	int h;
-	char *tmp;
+	char	*tmp;
 
 	h = 0;
 	ft_free_map(data);
 	data->m_height = ft_atoi(&data->line[8]);
-	data->m_width = ft_atoi(&data->line[11]) + 5;
+	data->m_width = ft_atoi(&data->line[11]) + 10;
 	data->map = (char**)malloc(sizeof(char*) * (data->m_height + 1));
 	ft_strdel(&data->line);
 	get_next_line(data->fd, &data->line);
@@ -101,7 +65,7 @@ static void ft_parsmap(t_data *data)
 	{
 		get_next_line(data->fd, &data->line);
 		tmp = ft_strsub(data->line, 4, data->m_width);
-		data->map[h] = ft_strjoin(tmp, "~~~~~");
+		data->map[h] = ft_strjoin(tmp, "~~~~~~~~~~");
 		h++;
 		ft_strdel(&data->line);
 		ft_strdel(&tmp);
@@ -109,7 +73,7 @@ static void ft_parsmap(t_data *data)
 	data->map[h] = 0;
 }
 
-static void ft_parstoken(t_data *data)
+static void		ft_parstoken(t_data *data)
 {
 	int h;
 
@@ -130,78 +94,24 @@ static void ft_parstoken(t_data *data)
 	data->token[h] = 0;
 }
 
-// static void ft_printmap(t_data *data)
-// {
-// 	int h;
-// 	int w;
-
-// 	h = 0;
-// 	w = 0;
-// 	while (h < data->m_height)
-// 	{
-// 		printf("%d ", (int)data->map[h][w]);
-// 		if (w < data->m_width)
-// 			w++;
-// 		else
-// 		{
-// 			w = 0;
-// 			h++;
-// 			printf("\n");
-// 		}
-// 	}
-// }
-
-// int main(int argc, char **argv)
-int main()
+int				main(void)
 {
 	t_data data;
-	// int i = 0;
-	
+
 	data = ft_init();
-	// data.fd = open(argv[1], O_RDONLY, 0);
 	get_next_line(data.fd, &data.line);
 	ft_player(&data);
 	ft_strdel(&data.line);
-	while(get_next_line(data.fd, &data.line))
+	while (get_next_line(data.fd, &data.line))
 	{
-		//write(2, &data.line, 10);
 		ft_parsmap(&data);
-
 		ft_parstoken(&data);
-		ft_manhattan(&data);
-		// ft_printmap(&data);
+		if (data.letter1 == 'X' && data.step < 12 && data.m_height < 20)
+			ft_up(&data);
+		else
+			ft_manhattan(&data);
 		ft_printcoord(&data);
+		data.step++;
 	}
-
-	// while (i < 15)
-	// {
-	// 	printf("%s\n", data.map[i]);
-	// 	i++;
-	// }
-	
-	
-	return(0);
-
+	return (0);
 }
-
-    // char *line;
-    // int  fd;
-    // int  i;
-	// int j = argc;
-	// j++;
-
-    // i = 0;
-    // fd = open(argv[1], O_RDONLY, 0);
-	// i = get_next_line(fd, &line);
-	// printf("%d\n", i);
-	// printf("fd is %d\n", fd);
-    // while (get_next_line(fd, &line) > 0)
-    // {
-	// 	printf("line[%i]: |%s|\n", i, line);
-	// 	//ft_putendl(line);
-	// 	//ft_putstr(line);
-	// 	ft_strdel(&line);
-	// 	i++;
-    // }
-	// close(fd);
-    // return (0);
